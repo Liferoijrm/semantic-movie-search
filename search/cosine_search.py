@@ -47,4 +47,20 @@ class SemanticSearch:
         return results, search_time
 
 if __name__ == "__main__":
-    pass
+    searcher = SemanticSearch()
+    
+    print("\n--- Sistema Pronto ---")
+    while True:
+        pergunta = input("\nFaça uma pergunta sobre um filme (ou 'sair' para encerrar): ")
+        if pergunta.lower() == 'sair':
+            break
+            
+        resultados, tempo = searcher.search(pergunta)
+        
+        print(f"\nBusca concluída em {tempo:.4f} segundos.")
+        print("Resultados encontrados:\n")
+        
+        for i, res in enumerate(resultados, 1):
+            # Imprime o título e o score (máximo é 1.0)
+            print(f"{i}. {res['title']} (Similaridade: {res['similarity_score']:.4f})")
+            print(f"   Resumo: {res['summary'][:200]}...\n")
