@@ -18,7 +18,7 @@ O sistema realiza uma busca semântica sobre a base de dados **CMU Movie Summary
 
 ### Linguagem
 
-* Python 3.12+
+* Python 3.11
 
 ### Interface
 

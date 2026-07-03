@@ -3,6 +3,7 @@ import numpy as np
 import time
 from gensim.models import Word2Vec
 from sklearn.metrics.pairwise import cosine_similarity
+from search.utils import build_result
 
 class Word2VecAverageSearch:
     def __init__(self, data_path='data/processed_movies.csv'):
@@ -27,11 +28,30 @@ class Word2VecAverageSearch:
     def search(self, query, top_k=5):
         """
         Efetua a busca linear comparando o vetor médio da query com os vetores dos filmes via cosseno.
+        Retorna uma tupla: (lista_de_dicts padronizados, tempo gasto).
         """
         start_time = time.time()
         query_vec = self._get_average_vector(query).reshape(1, -1)
         similarities = cosine_similarity(query_vec, self.movie_vectors).flatten()
         top_indices = similarities.argsort()[-top_k:][::-1]
+        
+        # Constrói a lista de resultados padronizados usando o schema alvo
+        results = []
+        for idx in top_indices:
+            row = self.df.iloc[idx]
+            score = similarities[idx]
+            results.append(build_result(row, score))
+            
         search_time = time.time() - start_time
         
-        return self.df.iloc[top_indices], search_time
+        return results, search_time
+
+if __name__ == "__main__":
+    # Teste de execução rápida do Word2Vec
+    searcher = Word2VecAverageSearch()
+    results, duration = searcher.search("romantic comedy in New York")
+    
+    import json
+    print(f"Tempo de busca: {duration:.4f}s\n")
+    print("Top 2 Resultados (Word2Vec):")
+    print(json.dumps(results[:2], indent=2, ensure_ascii=False))

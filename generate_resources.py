@@ -32,6 +32,11 @@ def generate_all_resources():
     sentence_embeddings = np.load('data/sentence_embeddings.npy').astype('float32')
     dimension = sentence_embeddings.shape[1]
     
+    # FIX: Normaliza os embeddings dos filmes na norma L2 antes de adicioná-los ao índice.
+    # Isso garante que a distância euclidiana mapeie perfeitamente para a similaridade de cosseno,
+    # correspondendo à query que também é normalizada em tempo de busca.
+    faiss.normalize_L2(sentence_embeddings)
+    
     index = faiss.IndexHNSWFlat(dimension, 32)
     index.add(sentence_embeddings)
     faiss.write_index(index, 'data/hnsw_index.faiss')
