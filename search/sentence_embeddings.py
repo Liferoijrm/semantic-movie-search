@@ -6,11 +6,16 @@ from sklearn.metrics.pairwise import cosine_similarity
 from search.utils import build_result
 
 class DenseTransformerSearch:
-    def __init__(self, data_path='data/processed_movies.csv', embeddings_path='data/sentence_embeddings.npy'):
+    def __init__(self, data_path='data/processed_movies.csv', embeddings_path='data/sentence_embeddings.npy', model=None):
         """
         Carrega a base de dados mapeada e os embeddings pré-computados via modelos de Transformers.
+        Aceita um modelo já instanciado para economizar memória.
         """
-        self.model = SentenceTransformer('all-MiniLM-L6-v2')
+        if model is not None:
+            self.model = model
+        else:
+            self.model = SentenceTransformer('all-MiniLM-L6-v2')
+            
         self.df = pd.read_csv(data_path)
         self.embeddings = np.load(embeddings_path)
         

@@ -21,7 +21,8 @@ def check_dependencies():
         for f in missing_files:
             print(f"   - {f}")
         print("\nExecute o pipeline de geração (clean_data.py e generate_resources.py) primeiro.")
-        sys.exit(1)
+        # SUBSTITUA O sys.exit(1) PELA LINHA ABAIXO:
+        raise FileNotFoundError("Arquivos obrigatórios ausentes.")
         
     print("✅ Todos os arquivos de dados necessários foram encontrados.\n")
 

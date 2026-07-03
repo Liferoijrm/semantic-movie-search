@@ -6,13 +6,18 @@ from sentence_transformers import SentenceTransformer
 from search.utils import build_result
 
 class HNSWApproximateSearch:
-    def __init__(self, data_path='data/processed_movies.csv'):
+    def __init__(self, data_path='data/processed_movies.csv', model=None):
         """
         Carrega o grafo HNSW pré-computado do disco de forma instantânea.
+        Aceita um modelo já instanciado para economizar memória.
         """
         self.df = pd.read_csv(data_path)
         self.index = faiss.read_index('data/hnsw_index.faiss')
-        self.model = SentenceTransformer('all-MiniLM-L6-v2')
+        
+        if model is not None:
+            self.model = model
+        else:
+            self.model = SentenceTransformer('all-MiniLM-L6-v2')
         
     def search(self, query, top_k=5):
         """
