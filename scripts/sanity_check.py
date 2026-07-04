@@ -1,5 +1,6 @@
 import os
 import sys
+from sentence_transformers import SentenceTransformer
 
 def check_dependencies():
     """
@@ -40,12 +41,15 @@ def run_sanity_check():
     from search.sentence_embeddings import DenseTransformerSearch
     from search.word2vec_average import Word2VecAverageSearch
 
+    # Carrega o modelo de embeddings uma ÚNICA vez para economizar RAM
+    shared_transformer = SentenceTransformer('all-MiniLM-L6-v2')
+
     # Instancia as 4 classes antes do loop para poupar processamento e memória
     searchers = {
         "ClassicCosineSearch": ClassicCosineSearch(),
         "Word2VecAverageSearch": Word2VecAverageSearch(),
-        "DenseTransformerSearch": DenseTransformerSearch(),
-        "HNSWApproximateSearch": HNSWApproximateSearch()
+        "DenseTransformerSearch": DenseTransformerSearch(model=shared_transformer),
+        "HNSWApproximateSearch": HNSWApproximateSearch(model=shared_transformer)
     }
 
     # Definição das queries cobrindo diferentes propósitos
