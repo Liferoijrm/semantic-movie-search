@@ -1,0 +1,100 @@
+1. Find a movie from a description (classic use case)
+"What is the movie where a hacker discovers that the world is a simulation?"
+"I'm looking for a movie about a ship that hits an iceberg."
+"What's the movie where a robot wants to become human?"
+"Is there a movie where a man ages backwards?"
+"What's the movie where people enter each other's dreams?"
+
+2. Recommend movies based on a description
+"Recommend movies about time travel."
+"I want thought-provoking science fiction movies."
+"Suggest movies about artificial intelligence."
+"Recommend movies involving police investigations and serial killers."
+"Suggest movies similar to stories about surviving on a deserted island."
+
+3. Search by theme
+"Movies about friendship."
+"Movies that deal with grief."
+"Movies that criticize capitalism."
+"Movies about freedom."
+"Movies that explore moral dilemmas."
+
+These queries are interesting because many movie summaries may never use these exact words while still conveying the same themes.
+
+4. Search by specific story elements
+"Movies where the main character loses their memory."
+"Movies where the protagonist is a detective."
+"Movies about aliens invading Earth."
+"Movies that take place in a prison."
+"Movies set almost entirely on a train."
+
+5. Search by mood
+"I want a sad movie."
+"I want a light-hearted movie to watch tonight."
+"Movies that are tense from beginning to end."
+"Movies with a surprising ending."
+"Movies that leave the audience confused."
+
+6. Search by combinations
+"I want a romance with science fiction."
+"Horror movies set in space."
+"A comedy about time travel."
+"Action movies with fantasy elements."
+"Drama based on a true story."
+7. Long natural language queries
+
+These are the kinds of queries that really showcase the advantage of semantic search.
+
+"I want to watch a movie where the main character discovers that everything they believed was a lie."
+"I'm looking for a movie about an artificial intelligence that starts developing emotions."
+"Recommend a movie similar to The Matrix, but not The Matrix itself."
+"I want a movie that combines philosophy, action, and science fiction."
+"I want a movie where a group of people must survive in a hostile environment."
+
+Guess the movie from its plot
+"What movie is about a hacker who discovers that the world is actually a simulation?"
+"I'm looking for a movie where a ship hits an iceberg during its maiden voyage."
+"What's the movie where people enter other people's dreams to steal information?"
+"What movie is about a man who ages backwards?"
+"I'm trying to remember a movie where a robot wants to become human."
+"What movie follows a group of astronauts trying to save humanity by traveling through a wormhole?"
+"What's the movie where dinosaurs are brought back to life through genetic engineering?"
+"What movie is about a young wizard attending a school of magic?"
+"I'm looking for a movie where a man is unknowingly living inside a giant reality TV show."
+"What movie is about a lawyer who cannot lie for an entire day?"
+
+Recommend movies based on a description
+"Recommend movies about time travel."
+"Suggest movies about artificial intelligence."
+"Recommend thought-provoking science fiction movies."
+"Suggest movies involving serial killers and detective investigations."
+"Recommend survival movies set on deserted islands."
+"I want movies about space exploration."
+"Recommend movies about revenge."
+"Suggest movies with unexpected plot twists."
+"Recommend movies about parallel universes."
+"I want movies that explore the consequences of advanced technology."
+
+Recommend movies similar to another movie
+"Recommend movies similar to The Matrix."
+"Suggest movies like Inception."
+"I enjoyed Interstellar. What should I watch next?"
+"Recommend movies similar to The Lord of the Rings."
+"Suggest movies like Titanic."
+"What movies are similar to The Truman Show?"
+"Recommend movies like Se7en."
+"If I liked The Dark Knight, what else should I watch?"
+"Suggest movies similar to Parasite."
+"Recommend movies like Blade Runner 2049."
+
+Recommend movies similar to another movie, with constraints
+"Recommend movies similar to The Matrix, but don't include The Matrix."
+"Suggest movies like Inception with more action."
+"Recommend movies similar to Titanic, but with a happier ending."
+"I liked Interstellar. Recommend movies with a similar atmosphere."
+"Suggest movies like The Shawshank Redemption that focus on hope and friendship."
+"Recommend movies similar to Alien, but with less horror."
+"Suggest movies like The Prestige that involve mystery and plot twists."
+"Recommend movies like Gladiator set in ancient civilizations."
+"I enjoyed The Martian. Recommend similar survival movies."
+"Suggest movies similar to Her that explore relationships with artificial intelligence."

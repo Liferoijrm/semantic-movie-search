@@ -2,13 +2,16 @@ import streamlit as st
 import time
 
 try:
-    from llm.query_formatter import format_query
+    from llm.query_formatter import format_query_for_transformers, format_query_for_word2vec
 except ImportError:
-    def format_query(query_raw):
+    # Fallback caso o arquivo ainda não exista ou dê erro
+    def format_query_for_transformers(query_raw):
+        return query_raw
+    def format_query_for_word2vec(query_raw):
         return query_raw
 
 try:
-    from llm.tinyllama import generate_response
+    from llm.phi4_mini import generate_response
 except ImportError:
     def generate_response(query, retrieved_movies):
         return "_(LLM ainda não integrado — mostrando apenas resultados brutos abaixo)_"
@@ -61,7 +64,7 @@ col1, col2 = st.columns([2, 1])
 with col1:
     selected_method = st.radio(
         "Escolha o algoritmo de busca:",
-        options=list(searchers.keys()) + ["Comparar todos (Ainda não funcional)"],
+        options=list(searchers.keys()),
         horizontal=True
     )
 
@@ -71,25 +74,28 @@ with col2:
 st.write("") 
 
 with st.form(key='search_form'):
-    query = st.text_input("Digite o enredo, tema ou conceito do filme que você procura:", 
-                          placeholder="Ex: A hacker discovers the world is a simulation...")
+    query = st.text_input("Faça uma pergunta (em inglês) sobre os filmes em nossa base de dados:", 
+                          placeholder="Ex: Recommend three movies about The Beatles, a great rock band from Liverpool")
     submit_button = st.form_submit_button(label="Buscar Filmes")
 
 if submit_button:
     if not query.strip():
         st.warning("Por favor, digite algum texto para realizar a busca (em inglês).")
     else:
-        query_formatted = format_query(query)
-        st.caption(f"Busca interpretada: _{query_formatted}_")
+        # Aplica a limpeza agressiva (sem stop words) para modelos baseados em saco de palavras/médias
+        if selected_method in ["TF-IDF", "Word2Vec"]:
+            query_formatted = format_query_for_word2vec(query)
+        # Aplica a limpeza leve (mantém sintaxe) para Transformers/HNSW
+        else: 
+            query_formatted = format_query_for_transformers(query)
+            
+        st.caption(f"Busca interpretada ({selected_method}): _{query_formatted}_")
 
-        if selected_method == "Comparar todos (Demo)":
-            results, duration = searchers["Sentence Embeddings"].search(query_formatted, top_k=top_k)
-        else:
-            results, duration = searchers[selected_method].search(query_formatted, top_k=top_k)
+        results, duration = searchers[selected_method].search(query_formatted, top_k=top_k)
 
         with st.chat_message("assistant"):
-            with st.spinner("Formatando resposta..."):
-                response_text = generate_response(query_formatted, results)
+            with st.spinner("Respondendo à pergunta..."):
+                response_text = generate_response(query, results)
             st.markdown(response_text)
 
         st.divider()

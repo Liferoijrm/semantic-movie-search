@@ -31,6 +31,8 @@ A ordem importa e não é óbvia pelos nomes dos arquivos:
 2. `generate_initial_embeddings.py` (no arquivo do repo está salvo como `generate_inital_embeddings.py`, veja seção 2.2) → gera `data/sentence_embeddings.npy` (precisa do CSV do passo 1)
 3. `generate_resources.py` → treina Word2Vec, gera `data/word2vec_embeddings.npy` e constrói o índice `data/hnsw_index.faiss` **a partir do `.npy` gerado no passo 2** — ou seja, mesmo o nome sugerir "recursos gerais", ele depende do passo 2 ter rodado antes.
 4. Só depois disso os arquivos em `search/` conseguem instanciar suas classes (todos leem algum artefato gerado nos passos 1–3).
+5. instale o ollama e de ollama pull phi4-mini
+6. rode streamlit run app.py
 
 Isso merece ficar documentado no README (a versão atual, gerada por IA, não menciona essa ordem de dependência).
 
