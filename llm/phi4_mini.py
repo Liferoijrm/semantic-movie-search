@@ -59,12 +59,12 @@ def generate_response(query, filmes_recuperados):
                 "content": (
                     f"Movies found:\n{lista_filmes}\n"
                     f"User's request: {query}\n\n"
-                    "If the user's request specifies a number of movies (e.g. 'three movies'), "
-                    "select only that many from the list above, keeping the original order (it's "
-                    "already ranked by relevance). Otherwise, include all movies listed.\n\n"
+                    "include in your answer only movies from the list above, considering the original order (it's "
+                    "already ranked by relevance). If the movie is not important for the user's request, DON'T INCLUDE IT\n\n"
                     "For EVERY movie you include, write exactly one line in this format\n"
-                    "- **Title**\n\n"
-                    "Write only the answer, one line with only the title per movie, then explain your answer very briefly to the user in second person."
+                    "- **Title** (Genres) \n\n"
+                    "Write only the answer, one line per movie, then explain your answer very" 
+                    "briefly in a single line to the user in second person."
                 )
             }
         ],
