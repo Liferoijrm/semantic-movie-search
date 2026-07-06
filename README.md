@@ -1,294 +1,113 @@
 # Semantic Movie Search
 
-Sistema de busca semântica e recomendação de filmes utilizando processamento de linguagem natural, embeddings vetoriais e modelos de linguagem locais.
+Sistema de busca semântica e recomendação de filmes utilizando processamento de linguagem natural, embeddings vetoriais e modelos de linguagem locais. 
+Projeto desenvolvido para a disciplina de Projeto e Análise de Algoritmos (PAA) da Universidade de Brasília (UnB) - Semestre 2026.1.
+
+## Equipe
+* Daniel Hollenbach - Matrícula: 241020859
+* Davi Bragança - Matrícula: 242001473
+* Davi Galvão - Matrícula: 241038577
+* Lucas Mendes - Matrícula: 241020750
+* Pedro Marcinoni - Matrícula: 241002396
 
 ## Objetivo
-
-O projeto foi desenvolvido para a disciplina de Projeto e Análise de Algoritmos da Universidade de Brasília (UnB) e tem como objetivo permitir que usuários façam perguntas em linguagem natural sobre filmes, como:
-
+O sistema permite que usuários façam perguntas em linguagem natural sobre filmes, como:
 * "Qual é o filme em que um homem fica preso em uma ilha e tenta sobreviver?"
-* "Me recomende filmes sobre viagens no tempo."
-* "Filmes parecidos com uma história de vingança e redenção."
+* "Me recomende filmes de ficção científica com inteligência artificial."
 
-O sistema realiza uma busca semântica sobre a base de dados **CMU Movie Summary Corpus**, recupera as sinopses mais relevantes e utiliza um modelo de linguagem local para gerar uma resposta formatada ao usuário.
+Utilizando a base de dados CMU Movie Summary Corpus (aprox. 42 mil filmes), o sistema realiza buscas semânticas comparando métodos clássicos e modernos, e em seguida formata a resposta final utilizando um LLM local (Phi-4 Mini).
 
----
+## Tecnologias e Bibliotecas
+* **Linguagem**: Python 3.11
+* **Interface**: Streamlit
+* **Modelos de Linguagem (LLM)**: Phi-4 Mini (via Ollama)
+* **Vetorização**: Sentence Transformers (all-MiniLM-L6-v2), Word2Vec (Gensim), TF-IDF (Scikit-learn)
+* **Busca e Indexação**: FAISS (Meta), Scikit-learn (Similaridade de Cosseno)
+* **Manipulação de Dados**: Pandas, NumPy
 
-## Tecnologias Utilizadas
+*Nota: Todas as bibliotecas utilizadas possuem licenças de código aberto (MIT, BSD, Apache 2.0 ou LGPL).*
 
-### Linguagem
+## Análise de Complexidade (PAA)
+O coração deste projeto é a análise rigorosa do custo algorítmico das operações:
 
-* Python 3.11
+1. **Pré-processamento:** Limpeza de texto e união de bases. 
+    * **Complexidade:** $O(N)$, onde $N$ é o número de filmes.
+2. **Busca Exata (Similaridade de Cosseno):** Comparação matricial de força bruta.
+    * **Complexidade:** $O(N \times D)$, onde $D$ é o número de dimensões do vetor (ex: 384). Alto custo computacional em tempo de inferência.
+3. **Busca Aproximada (HNSW via FAISS)**: Navegação baseada em grafos hierárquicos. 
+    * **Complexidade (busca):** $O(\log N)$. Permite buscas instantâneas, sacrificando precisão marginal por ganho drástico de desempenho.
+    * **Complexidade (construção):** $O(N \log N)$.
 
-### Interface
+**Trade-offs (Tempo vs Qualidade)**: Modelos densos (Sentence Embeddings) custam mais tempo/memória para treinar/indexar do que médias simples (Word2Vec), mas a qualidade de recuperação (Hit@5) é substancialmente superior. Passar mais contexto para o LLM aumenta a qualidade da resposta, mas eleva o custo temporal de inferência linearmente.
 
-* Streamlit
-
-### Inteligência Artificial
-
-* TinyLlama (via Ollama)
-* Sentence Transformers
-* Word2Vec (Gensim)
-
-### Recuperação de Informação
-
-* Similaridade do Cosseno
-* Sentence Embeddings
-* HNSW / Approximate Nearest Neighbors
-* FAISS
-
-### Manipulação e Processamento de Dados
-
-* NumPy
-* Pandas
-* Scikit-learn
-
----
-
-## Arquitetura do Sistema
-
+## Estrutura do Projeto
 ```text
-Usuário
-   │
-   ▼
-Pergunta em Linguagem Natural
-   │
-   ▼
-Pré-processamento
-   │
-   ▼
-Geração de Vetores
- ├─ Word2Vec Average
- └─ Sentence Embeddings
-   │
-   ▼
-Busca Semântica
- ├─ Similaridade do Cosseno
- └─ HNSW (FAISS)
-   │
-   ▼
-Recuperação das Sinopses
-   │
-   ▼
-TinyLlama (Ollama)
-   │
-   ▼
-Resposta Formatada
+semantic-movie-search/
+│
+├── data/                                 # Diretório para os dados brutos e processados
+├── preprocessing/
+│   └── clean_data.py                     # Script de limpeza e fusão (O(N))
+├── search/
+│   ├── cosine_similarity.py              # Busca exata (TF-IDF/Dense)
+│   ├── hnsw_search.py                    # Busca aproximada com FAISS
+│   ├── sentence_embeddings.py            # Vetorização com MiniLM
+│   ├── word2vec_average.py               # Vetorização com Gensim
+│   └── utils.py                          # Funções auxiliares de busca
+├── llm/
+│   ├── phi4_mini.py                      # Integração com servidor Ollama local
+│   └── query_formatter.py                # Limpeza sintática do prompt do usuário
+├── evaluation/
+│   ├── analise_benchmark.ipynb           # Notebook com gráficos de tempo vs qualidade
+│   ├── benchmark.py                      # Script de execução de testes (Hit@k)
+│   ├── metrics.py                        # Fórmulas de cálculo de precisão
+│   └── queries.py                        # Dataset de perguntas com gabarito
+├── scripts/
+│   └── sanity_check.py                   # Verificador de ambiente e dependências
+├── app.py                                # Interface web (Streamlit) principal
+├── requirements.txt
+├── PLANO_DE_PROJETO.md
+└── README.md
 ```
 
----
+## Como Executar
 
-## Dataset
-
-### CMU Movie Summary Corpus
-
-Base de dados pública contendo:
-
-* Metadados de milhares de filmes
-* Resumos (plot summaries)
-* Informações de elenco
-* Informações de gêneros
-
-Fonte:
-
-https://www.cs.cmu.edu/~ark/personas/
-
----
-
-## Métodos Implementados
-
-### 1. Word2Vec Average
-
-Cada sinopse é representada pela média dos vetores das palavras presentes no texto.
-
-Vantagens:
-
-* Simples
-* Baixo custo computacional
-
-Limitações:
-
-* Perde contexto semântico complexo
-
----
-
-### 2. Sentence Embeddings
-
-Utiliza modelos pré-treinados da biblioteca Sentence Transformers para gerar vetores representando frases e documentos completos.
-
-Vantagens:
-
-* Melhor compreensão semântica
-* Melhor qualidade de recuperação
-
-Limitações:
-
-* Maior custo computacional
-
----
-
-### 3. Similaridade do Cosseno
-
-Mede o grau de semelhança entre dois vetores através do ângulo entre eles.
-
-[
-\cos(\theta) =
-\frac{A \cdot B}{||A|| ||B||}
-]
-
-Utilizada como método principal para ranqueamento.
-
----
-
-### 4. HNSW Search
-
-Estrutura de busca aproximada baseada em grafos hierárquicos implementada através do FAISS.
-
-Vantagens:
-
-* Busca extremamente rápida
-* Escala para grandes volumes de dados
-
-Limitações:
-
-* Pode perder alguns resultados exatos
-
----
-
-## Instalação
-
-### Clonar o Repositório
+### 1. Preparação do Ambiente
+Recomenda-se estritamente o uso do Python 3.11 para evitar quebras de compatibilidade em C++ com o gensim e o numpy.
 
 ```bash
-git clone https://github.com/seu-usuario/semantic-movie-search.git
+# Criação do ambiente virtual
+python3.11 -m venv venv
 
-cd semantic-movie-search
-```
-
-### Criar Ambiente Virtual
-
-```bash
-python -m venv venv
-```
-
-Linux/macOS:
-
-```bash
+# Ativação (Linux/macOS)
 source venv/bin/activate
-```
-
-Windows:
-
-```bash
+# Ativação (Windows)
 venv\Scripts\activate
-```
 
-### Instalar Dependências
-
-```bash
+# Instalação das dependências
 pip install -r requirements.txt
 ```
 
----
-
-## Instalação do Ollama
-
-Instale o Ollama:
-
-https://ollama.com
-
-Baixe o modelo TinyLlama:
+### 2. Preparação dos Dados
+Baixe os arquivos movie.metadata.tsv e plot_summaries.txt do CMU Movie Summary Corpus e coloque-os dentro da pasta data/. 
+Em seguida, execute a limpeza:
 
 ```bash
-ollama pull tinyllama
-```
+python preprocessing/clean_data.py
+``` 
 
-Verifique se o servidor está ativo:
+### 3. Servidor LLM (Ollama)
+Certifique-se de ter o Ollama instalado em sua máquina e o modelo Phi-4 Mini baixado:
 
 ```bash
-ollama serve
-```
+ollama pull phi4-mini
+``` 
 
----
+Mantenha o serviço do ollama rodando em background
 
-## Execução
+### 4. Interface de Usuário
+Com os dados limpos, os vetores gerados e o Ollama rodando, inicie o aplicativo:
 
 ```bash
 streamlit run app.py
 ```
-
-A aplicação ficará disponível em:
-
-```text
-http://localhost:8501
-```
-
----
-
-## Estrutura do Projeto
-
-```text
-semantic-movie-search/
-│
-├── data/
-│   ├── movie.metadata.tsv
-│   └── plot_summaries.txt
-│
-├── preprocessing/
-│   ├── clean_data.py
-│   └── embeddings.py
-│
-├── search/
-│   ├── cosine_search.py
-│   ├── hnsw_search.py
-│   └── faiss_index.py
-│
-├── llm/
-│   └── tinyllama.py
-│
-├── app.py
-├── requirements.txt
-└── README.md
-```
-
----
-
-## Comparação de Métodos
-
-| Método                        | Qualidade | Velocidade |
-| ----------------------------- | --------- | ---------- |
-| Word2Vec Average + Cosseno    | Média     | Alta       |
-| Sentence Embeddings + Cosseno | Alta      | Média      |
-| Sentence Embeddings + HNSW    | Alta      | Muito Alta |
-
----
-
-## Possíveis Perguntas
-
-* Qual é o filme sobre um náufrago em uma ilha?
-* Filmes parecidos com Matrix.
-* Recomende filmes de ficção científica envolvendo inteligência artificial.
-* Qual filme tem uma história sobre vingança familiar?
-
----
-
-## Licenças
-
-As bibliotecas utilizadas possuem licenças abertas compatíveis com uso acadêmico:
-
-* Python — PSF License
-* NumPy — BSD
-* Pandas — BSD
-* Scikit-learn — BSD
-* Gensim — LGPL
-* Sentence Transformers — Apache 2.0
-* FAISS — MIT
-* Streamlit — Apache 2.0
-* Ollama — MIT
-* TinyLlama — Apache 2.0
-
----
-
-## Autores
-
-Projeto desenvolvido para a disciplina Projeto e Análise de Algoritmos (PAA) da Universidade de Brasília (UnB), semestre 1/2026.
+Acesse http://localhost:8501 no seu navegador.
