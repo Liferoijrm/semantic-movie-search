@@ -8,6 +8,7 @@
 \usepackage{fontawesome5}
 \usepackage{graphicx}
 \usepackage{multicol}
+\usepackage{amsmath}
 
 % Tema e cores
 \usetheme{Madrid}
@@ -16,7 +17,7 @@
 % Configurações de título
 \title[Semantic Movie Search]{Semantic Movie Search}
 \subtitle{Busca semântica de filmes em linguagem natural, com resposta formatada por um LLM local}
-\author[PAA - UnB]{PROJETO E ANÁLISE DE ALGORITMOS }
+\author[PAA - UnB]{PROJETO E ANÁLISE DE ALGORITMOS}
 \institute[UnB]{Universidade de Brasília (UnB) \\ 2026.1}
 \date{06/07/2026}
 
@@ -61,6 +62,22 @@
 \end{frame}
 
 % ---------------------------------------------------
+% Slide: Demonstração do Sistema (Interface Streamlit)
+% ---------------------------------------------------
+\begin{frame}{Demonstração do Sistema}
+    \framesubtitle{Interface gráfica desenvolvida em Streamlit}
+    
+    \begin{center}
+        \includegraphics[width=0.85\linewidth]{image_edfd60.jpg}
+    \end{center}
+    
+    \vspace{-0.2cm}
+    \begin{center}
+        \footnotesize{\textit{Interface web local permitindo a escolha dinâmica dos algoritmos, ajuste de $top\_k$ e exibição da resposta formatada pelo LLM local.}}
+    \end{center}
+\end{frame}
+
+% ---------------------------------------------------
 % Slide 3: Ponto 1 - Integrantes
 % ---------------------------------------------------
 \begin{frame}{1. Integrantes do grupo}
@@ -75,7 +92,6 @@
         \item \textbf{Lucas Mendes} - Matrícula: 241020750 
         \item \textbf{Pedro Marcinoni} - Matrícula: 241002396 
     \end{itemize}
-    
     \vspace{0.5cm}
 \end{frame}
 
@@ -85,22 +101,22 @@
 \begin{frame}{2 e 3. Linguagens, bibliotecas e programas}
     \begin{itemize}
         \item \textbf{Linguagem Principal:} Python 3.11
-        \vspace{0.3cm}
+        \vspace{0.1cm}
         \item \textbf{Bibliotecas e Licenças:} 
         \begin{itemize}
             \item \texttt{sentence-transformers}, \texttt{faiss-cpu}, \texttt{gensim}, \texttt{scikit-learn}, \texttt{streamlit}, \texttt{pandas}.
             \item Todas são \textit{open source} (licenças MIT/Apache/BSD).
         \end{itemize}
-        \vspace{0.3cm}
+        \vspace{0.1cm}
         \item \textbf{Programas / Servidor:}
         \begin{itemize}
             \item Interface local em \textbf{Streamlit} (\texttt{streamlit run app.py}).
             \item LLM local rodando via \textbf{Ollama} (modelo Phi-4 Mini).
         \end{itemize}
-        \vspace{0.3cm}
+        \vspace{0.1cm}
         \item \textbf{Banco de Dados:}
         \begin{itemize}
-            \item Nenhum SGBD tradicional. Dados servidos a partir de arquivos \texttt{CSV} + arquivos \texttt{.npy} / \texttt{.faiss} carregados diretamente em memória (viável dado o escopo e tamanho do dataset).
+            \item Nenhum SGBD tradicional. Dados servidos a partir de arquivos \texttt{CSV} + matrizes esparsas e densas (\texttt{.npy} / \texttt{.faiss}) carregadas diretamente em memória RAM (solução viável para o escopo e tamanho do dataset).
         \end{itemize}
     \end{itemize}
 \end{frame}
@@ -112,15 +128,14 @@
     \begin{center}
         \Large \faSitemap \quad Fluxo da Arquitetura
     \end{center}
-    
     \vspace{0.3cm}
     \begin{enumerate}
-        \item \textbf{Entrada:} Usuário digita a pergunta na interface.
-        \item \textbf{Processamento da Query:} \texttt{format\_query()} processa a entrada.
-        \item \textbf{Busca Semântica:} Execução de 1 dos 4 métodos de busca (escolhido pelo usuário na interface para fins de comparação).
-        \item \textbf{Padronização:} Resultados formatados através da função \texttt{build\_result}.
-        \item \textbf{Geração de Texto:} LLM local recebe o contexto recuperado e formata a resposta.
-        \item \textbf{Saída:} Exibição do resultado final na interface do Streamlit.
+        \item \textbf{Entrada:} Usuário digita a pergunta em linguagem natural na interface Streamlit.
+        \item \textbf{Processamento da Query:} O texto de entrada passa por limpeza e vetorização em tempo real.
+        \item \textbf{Busca Semântica:} Execução de 1 dos 4 métodos de busca (escolhido para fins de comparação).
+        \item \textbf{Padronização:} O arquivo de utilitários unifica as estruturas de dados de retorno.
+        \item \textbf{Geração de Resposta (RAG):} O LLM local recebe as melhores sinopses como contexto estruturado.
+        \item \textbf{Saída:} Exibição da resposta textual consolidada pelo LLM e dos cards de metadados.
     \end{enumerate}
 \end{frame}
 
@@ -129,7 +144,6 @@
 % ---------------------------------------------------
 \begin{frame}{5. Dados de treinamento (Dataset)}
     \framesubtitle{Origem, escopo e obtenção}
-    
     \textbf{Dataset: CMU Movie Summary Corpus}
     \begin{itemize}
         \item Criado por Bamman, O'Connor \& Smith -- \textit{"Learning Latent Personas of Film Characters"}, ACL 2013.
@@ -141,24 +155,18 @@
         \item \textbf{Licença:} Creative Commons Attribution-ShareAlike.
         \item \textbf{Obtenção:} Download direto de arquivos compactados (\texttt{.tar.gz}) da página pública do grupo ARK (CMU) -- sem necessidade de \textit{scraping}.
     \end{itemize}
-    
     \vspace{0.3cm}
     \begin{columns}
-        \begin{column}{0.33\textwidth}
+        \begin{column}{0.5\textwidth}
             \centering
             \Large \textbf{42.306} \\
             \normalsize sinopses de filmes
         \end{column}
-        \begin{column}{0.33\textwidth}
+        \begin{column}{0.5\textwidth}
             \centering
             \Large \textbf{81.741} \\
-            \normalsize filmes c/ metadados
+            \normalsize filmes com metadados
         \end{column}
-     %   \begin{column}{0.33\textwidth}
-      %      \centering
-       %     \Large \textbf{450.669} \\
-       %     \normalsize personagens
-       % \end{column}
     \end{columns}
 \end{frame}
 
@@ -167,7 +175,6 @@
 % ---------------------------------------------------
 \begin{frame}{5. Dados de treinamento (Arquivos)}
     \framesubtitle{Tamanho e subconjunto de trabalho}
-    
     \begin{table}[]
         \centering
         \small
@@ -175,75 +182,74 @@
             \toprule
             \textbf{Arquivo} & \textbf{Tamanho} & \textbf{Conteúdo} \\
             \midrule
-            \texttt{plot\_summaries.txt} & 29 MB & Sinopses (ID Wikipédia + texto) \\
+            \texttt{plot\_summaries.txt} & 29 MB & Sinopses (ID Wikipédia + texto bruto) \\
             \texttt{movie.metadata.tsv} & 3,4 MB & Título, data, receita, gêneros (Freebase) \\
-          %  \texttt{character.metadata.tsv} & 14 MB & 450.669 personagens (nome, idade, gênero ator) \\
-         %   \texttt{tvtropes.clusters.txt} & 58 KB & 72 tipos de persona, 501 instâncias (avaliação) \\
-        %    \texttt{name.clusters.txt} & 65 KB & 970 nomes recorrentes em $>1$ filme \\
             \bottomrule
         \end{tabular}
     \end{table}
-    
-    \vspace{0.3cm}
-    \textbf{Subconjunto utilizado:} 
-    \textit{Merge} (\textit{inner join} pelo ID da Wikipédia) entre sinopses e metadados, resultando em \textbf{42.204 filmes} (sinopse + gênero). Os 4 métodos de busca operam exclusivamente sobre esse subconjunto.
+    \vspace{0.2cm}
+    \textbf{Subconjunto utilizado:} \\
+    Foi realizado um \textit{inner join} (via Pandas) usando o ID da Wikipédia como chave comum. O resultado final gerou \textbf{42.204 filmes} consistentes (contendo simultaneamente metadados e sinopse). Os 4 métodos operam estritamente sobre esta base unificada.
 \end{frame}
 
 % ---------------------------------------------------
 % Slide 8: Ponto 6 - Pré-processamento
 % ---------------------------------------------------
 \begin{frame}{6. Pré-processamento e complexidade}
-    \framesubtitle{Pipeline de dados (\texttt{clean\_data.py})}
-    
+    \framesubtitle{Pipeline de dados unificado (\texttt{clean\_data.py})}
     \begin{enumerate}
         \item \textbf{Merge dos dados:} \\
-        União dos arquivos por ID (\textit{inner join}). \\
-        \textit{Complexidade:} $\mathcal{O}(N \log N)$
+        União das tabelas de metadados e sinopses via \textit{Hash Join} interno do Pandas. \\
+        \textit{Complexidade:} $\mathcal{O}(N)$ no caso médio.
         
         \item \textbf{Parse de gêneros:} \\
-        Dicionário Freebase (JSON) $\rightarrow$ string "Gênero1;Gênero2" na coluna \texttt{Genres\_clean}. \\
-        \textit{Complexidade:} $\mathcal{O}(N \cdot g)$
+        Extração de strings em formato JSON do Freebase $\rightarrow$ convertido para strings simples separadas por ``;``. \\
+        \textit{Complexidade:} $\mathcal{O}(N \cdot g)$, onde $g$ é a quantidade média de gêneros por filme.
         
-        \item \textbf{Limpeza de texto:} \\
-        Remoção de pontuação + \textit{lowercase} da sinopse $\rightarrow$ \texttt{Clean\_summary}. \\
-        \textit{Complexidade:} $\mathcal{O}(N \cdot L)$
+        \item \textbf{Limpeza de texto de sinopses:} \\
+        Remoção de caracteres especiais via Regex, tokenização básica e normalização para \textit{lowercase}. \\
+        \textit{Complexidade:} $\mathcal{O}(N \cdot L)$, onde $L$ é o tamanho médio em caracteres das sinopses.
         
-        \item \textbf{Exportação:} \\
-        Geração do \texttt{processed\_movies.csv} (42.204 linhas $\times$ 6 colunas). \\
-        \textit{Complexidade:} $\mathcal{O}(N)$
+        \item \textbf{Exportação:} Persistência do arquivo estruturado \texttt{processed\_movies.csv}. \\
+        \textit{Complexidade:} $\mathcal{O}(N)$ de escrita em disco.
     \end{enumerate}
-    
-    \vspace{0.2cm}
-    \footnotesize{\textit{* $N$ = filmes, $L$ = tamanho da sinopse, $g$ = qtd. de gêneros. O custo é dominado pela limpeza de texto, linear no volume do corpus.}}
+    \vspace{0.1cm}
+    \footnotesize{\textit{* O custo total do pipeline é linear $\mathcal{O}(N \cdot L)$, dominado estritamente pelo volume de texto bruto do corpus.}}
 \end{frame}
 
 % ---------------------------------------------------
-% Slide 9: Ponto 6 - Resolução de bug
+% Slide 9: Ponto 6 - Resolução de bug matemático
 % ---------------------------------------------------
-
+\begin{frame}{6. Resolução de Bug: Compatibilidade de Métricas}
+    \framesubtitle{Ajuste crucial em \texttt{generate\_resources.py} para o índice HNSW}
+    \begin{itemize}
+        \item \textbf{O Problema:} O algoritmo HNSW nativo do FAISS computa distâncias  Euclidianas. Contudo, o escopo de busca semântica exige a métrica de \textbf{Similaridade de Cosseno}.
+        \item \textbf{A Solução Matemática:} Aplicou-se a normalização geométrica de vetores antes da indexação no grafo.
+        \end{itemize}
+\end{frame}
 
 % ---------------------------------------------------
 % Slide 10: Ponto 7 - Treinamento
 % ---------------------------------------------------
-\begin{frame}{7. Treinamento dos modelos}
+\begin{frame}{7. Treinamento e Indexação dos Modelos}
+    \framesubtitle{Configurações e Complexidades Teóricas}
     \begin{itemize}
-        \item \textbf{Word2Vec:} 
+        \item \textbf{Word2Vec (Gensim):} 
         \begin{itemize}
-            \item Treinado do zero sobre o corpus (\texttt{gensim}).
-            \item Hiperparâmetros principais: \texttt{vector\_size=100}, \texttt{window=5}, \texttt{min\_count=1}.
+            \item Treinado do zero sobre o corpus. Parâmetros: \texttt{vector\_size=100}, \texttt{window=5}, \texttt{min\_count=1}.
+            \item \textit{Complexidade de Treino:} $\mathcal{O}(E \cdot W \cdot V)$, onde $E$ é o número de épocas, $W$ janelas e $V$ vocabulário.
         \end{itemize}
-        \vspace{0.3cm}
-        \item \textbf{Sentence Embeddings:}
+        \vspace{0.1cm}
+        \item \textbf{Sentence Embeddings (all-MiniLM-L6-v2):}
         \begin{itemize}
-            \item Uso de modelo pré-treinado (\texttt{all-MiniLM-L6-v2}).
-            \item Sem necessidade de \textit{fine-tuning} (diferença chave em relação à abordagem Word2Vec).
+            \item Modelo baseado em Transformer pré-treinado. Geração de vetores densos de 384 dimensões.
+            \item \textit{Complexidade de Extração:} $\mathcal{O}(N \cdot L^2)$ devido à atenção quadrática do Transformer.
         \end{itemize}
-        \vspace{0.3cm}
-        \item \textbf{HNSW (FAISS):}
+        \vspace{0.1cm}
+        \item \textbf{Grafo HNSW (FAISS):}
         \begin{itemize}
-            \item Índice \texttt{IndexHNSWFlat} construído sobre os embeddings.
-            \item Normalização L2 aplicada; Parâmetro $M=32$.
-            \item Complexidade de indexação vs. latência de consulta sub-linear na inferência.
+            \item Construído sobre as matrizes densas do MiniLM. Configurado com parâmetro de conectividade $M=32$.
+            \item \textit{Complexidade de Indexação:} $\mathcal{O}(N \log N)$, gerando buscas de latência sub-linear.
         \end{itemize}
     \end{itemize}
 \end{frame}
@@ -252,170 +258,150 @@
 % Slide 11: Ponto 8 - Formação da resposta
 % ---------------------------------------------------
 \begin{frame}{8. Como o servidor forma a resposta}
+    \framesubtitle{Estratégia de RAG Determinística e Resiliente}
     \begin{itemize}
-        \item \textbf{Injeção de Contexto (RAG):}
+        \item \textbf{Injeção Estrita de Contexto (RAG):}
         \begin{itemize}
-            \item Apenas as sinopses mais relevantes (recuperadas pelo \texttt{top\_k} da busca semântica) são passadas ao LLM.
-            \item O corpus inteiro nunca é carregado no \textit{prompt}.
+            \item Apenas os metadados e os resumos dos filmes recuperados no \texttt{top\_k} da busca alimentam o prompt. O corpus inteiro jamais satura a janela de tokens.
         \end{itemize}
-        \vspace{0.3cm}
-        \item \textbf{Configuração do LLM Local:}
+        \vspace{0.1cm}
+        \item \textbf{Configuração da Janela do LLM (Ollama):}
         \begin{itemize}
-            \item Modelo: Phi-4 Mini rodando no Ollama.
-            \item \textit{Prompt} determinístico: \texttt{temperature=0} e \texttt{top\_p=0.1} (escolha técnica para mitigar alucinações e focar nos fatos da sinopse).
+            \item Modelo utilizado localmente: \textbf{Phi-4 Mini}.
+            \item Hiperparâmetros técnicos restritivos: \texttt{temperature=0.1} e \texttt{top\_p=0.3}. Força o modelo a agir como um formatador factual, minimizando alucinações de títulos de filmes.
         \end{itemize}
-        \vspace{0.3cm}
-        \item \textbf{Latência e Resiliência:}
+        \vspace{0.1cm}
+        \item \textbf{Mecanismo de Resiliência (Fallback):}
         \begin{itemize}
-            \item A etapa de geração é o gargalo de latência, sendo dependente do tamanho do contexto enviado.
-            \item Fallback implementado caso a API do Ollama fique offline.
+            \item Implementada a classe de exceção personalizada \texttt{LLMResponseError} em \texttt{phi4\_mini.py}. Caso a resposta do modelo falhe nas checagens de sanidade ou o Ollama caia, o sistema chaveia para a exibição direta e estruturada dos metadados extraídos da busca semântica, sem quebrar o app.
         \end{itemize}
     \end{itemize}
 \end{frame}
 
 % ---------------------------------------------------
-% Slide 12: Pontos 9 e 10 - Hardware e Tempo
+% Slide 12: Pontos 9 e 10 - Hardware e Tempos
 % ---------------------------------------------------
-\begin{frame}{9 e 10. Recursos e Tempo de Execução}
+\begin{frame}{9 e 10. Recursos Computacionais e Tempos de Execução}
     \begin{itemize}
-        \item \textbf{Recursos Computacionais Disponíveis:}
+        \item \textbf{Recursos Disponíveis para o Grupo:} Notebook Intel Core i7-11800H (8 núcleos / 16 threads), 16 GB RAM, GPU RTX 3050 Ti. Toda a indexação matemática e inferência corre em CPU (\texttt{faiss-cpu}), provando a viabilidade local da arquitetura RAG sem infraestrutura cara.
+        \item \textbf{Tempos Medidos de Execução por Fase:}
         \begin{itemize}
-            \item Notebook: Intel Core i7-11800H (8c/16t), 16\,GB RAM, GPU RTX 3050 Ti --- execução em CPU (\texttt{faiss-cpu} + modelos em CPU).
-            \item Justifica viabilidade do Word2Vec do zero vs. impossibilidade de \textit{fine-tuning} local de LLMs pesados.
-        \end{itemize}
-        \vspace{0.2cm}
-        \item \textbf{Tempos Medidos por Fase:}
-        \begin{itemize}
-            \item \textbf{Pré-processamento:} $\sim$2s (merge + parse de gêneros + limpeza).
-            \item \textbf{Geração de Embeddings (MiniLM):} $\sim$73s.
-            \item \textbf{Treinamento Word2Vec:} $\sim$30s (treino + vetores-médio).
-            \item \textbf{Índice HNSW:} $\sim$2s (sobre os embeddings prontos).
-        \end{itemize}
-        \vspace{0.2cm}
-        \item \textbf{Comparativo dos 4 métodos de busca:}
-        \begin{itemize}
-            \item Tempo médio de inferência, taxa de acerto (\textit{hit@k}) e complexidade teórica (ver slide a seguir).
+            \item \textbf{Pré-processamento (\texttt{clean\_data.py}):} $\sim$ 2 segundos.
+            \item \textbf{Extração de Embeddings (Transformer MiniLM):} $\sim$ 73 segundos.
+            \item \textbf{Treinamento Word2Vec do zero + Vetores Médios:} $\sim$ 30 segundos.
+            \item \textbf{Construção do Índice HNSW (FAISS):} $\sim$ 2 segundos.
         \end{itemize}
     \end{itemize}
 \end{frame}
 
 % ---------------------------------------------------
-% Slide: Benchmark dos 4 métodos (avaliação - Fase 2)
+% Slide 13: Benchmark dos 4 métodos (avaliação - Fase 2)
 % ---------------------------------------------------
-\begin{frame}{Benchmark: comparação dos 4 métodos de busca}
-    \framesubtitle{Três eixos --- construção, tempo de busca e qualidade --- sobre 55 queries com gabarito}
+\begin{frame}{Benchmark: Comparação Teórica e Prática dos 4 Métodos}
+    \framesubtitle{Métricas extraídas sobre 55 queries controladas com gabarito histórico}
     \begin{table}[]
         \centering
         \small
-        \begin{tabular}{@{}l r r r r@{}}
+        \begin{tabular}{@{}l c r r c c@{}}
             \toprule
-            \textbf{Método} & \textbf{Constr.} & \textbf{Busca (ms)} & \textbf{hit@5} & \textbf{MRR} \\
+            \textbf{Método de Busca} & \textbf{Complexidade Teórica} & \textbf{Construção} & \textbf{Busca (ms)} & \textbf{hit@5} & \textbf{MRR} \\
             \midrule
-            TF-IDF (linear)         & 3,6s          & $\sim$78         & 0,16          & 0,12 \\
-            Word2Vec (linear)       & 30s           & $\sim$10         & 0,00          & 0,00 \\
-            Sentence Emb.\ (linear) & 73s           & $\sim$65         & \textbf{0,35} & \textbf{0,25} \\
-            Sentence Emb.\ (HNSW)   & 75s           & \textbf{$\sim$6} & 0,27          & 0,22 \\
+            TF-IDF + Cosseno & $\mathcal{O}(N \cdot V_{\text{query}})$ & 3,6s & $\sim$78 ms & 0,16 & 0,12 \\
+            Word2Vec Average & $\mathcal{O}(N \cdot d)$ & 30,0s & $\sim$10 ms & 0,00 & 0,00 \\
+            Sentence Emb. (Linear) & $\mathcal{O}(N \cdot d)$ & 73,0s & $\sim$65 ms & \textbf{0,35} & \textbf{0,25} \\
+            Sentence Emb. (HNSW) & $\mathcal{O}(\log N \cdot d)$ & 75,0s & \textbf{$\sim$6 ms} & 0,27 & 0,22 \\
             \bottomrule
         \end{tabular}
     \end{table}
-
     \vspace{0.1cm}
     \begin{itemize}
-        \item \textbf{A representação define a qualidade:} MiniLM $\gg$ TF-IDF $\gg$ Word2Vec.
-        \item \textbf{HNSW $\approx 11\times$ mais rápido} que a busca linear densa (a apenas +2s de construção do índice), perdendo pouca qualidade --- o \textit{trade-off} exato vs.\ aproximado.
-        \item \textbf{Word2Vec} (treinado só nas 42k sinopses) é fraco demais: a média dos vetores dilui o significado.
+        \item \textbf{Análise Teórica vs Prática:} O HNSW atinge o cenário ideal. Sendo matematicamente sub-linear ($\mathcal{O}(\log N)$), ele é \textbf{11 vezes mais rápido} que a busca linear exata do Transformer, sacrificando uma margem aceitável de qualidade (ajuste fino de trade-off aproximado).
+        \item \textbf{A Falha do Word2Vec:} Embora rápido (10ms), a média simples de vetores dilui as sinopses longas, resultando em métricas nulas (0,00) de acerto.
     \end{itemize}
-    \footnotesize{\textit{* Tempos medidos nesta máquina (média por query). A razão entre métodos é o que importa, não o valor absoluto.}}
 \end{frame}
 
 % ---------------------------------------------------
-% Slide: Gráficos do benchmark (avaliação - Fase 2)
+% Slide 14: Gráficos do benchmark (avaliação - Fase 2)
 % ---------------------------------------------------
-\begin{frame}{Benchmark: visualização}
+\begin{frame}{Benchmark: Visualização Empírica}
     \begin{columns}[T]
         \begin{column}{0.5\textwidth}
             \centering
-            \includegraphics[width=\linewidth]{assets/bench_tradeoff.png}
-
+            \includegraphics[width=0.85\linewidth]{assets/bench_tradeoff.png}
             \vspace{0.1cm}
-            \footnotesize HNSW no canto ideal: quase tão bom quanto a busca exata densa, e muito mais rápido.
+            \\ \footnotesize HNSW posicionado no quadrante ideal: latência minimalista com retenção da qualidade densa.
         \end{column}
         \begin{column}{0.5\textwidth}
             \centering
-            \includegraphics[width=\linewidth]{assets/bench_categoria.png}
-
+            \includegraphics[width=0.85\linewidth]{assets/bench_categoria.png}
             \vspace{0.1cm}
-            \footnotesize A semântica (MiniLM) domina; queries de usuário são as mais difíceis; Word2Vec fica zerado.
+            \\ \footnotesize Representações semânticas profundas dominam as queries textuais; a sintaxe pura (TF-IDF) falha em buscas vagas.
         \end{column}
     \end{columns}
 \end{frame}
 
 % ---------------------------------------------------
-% Slide 13: Pontos 11 e 12 - Trade-offs
+% Slide 15: Pontos 11 e 12 - Trade-offs
 % ---------------------------------------------------
-\begin{frame}{11 e 12. Trade-offs: Qualidade x Tempo}
-    \begin{columns}
+\begin{frame}{11 e 12. Trade-offs: Tempo x Qualidade}
+    \begin{columns}[T]
         \begin{column}{0.5\textwidth}
-            \textbf{Tempo de Treino x Qualidade}
+            \textbf{Tempo de Treino e Indexação x Qualidade}
             \begin{itemize}
-                \item Mais épocas no Word2Vec ou escolha de embeddings mais densos geram vetores melhores, mas aumentam custo de treinamento e memória.
+                \item Mudar para modelos com maior dimensionalidade (ex: \texttt{all-mpnet-base-v2}, 768d) eleva a precisão, mas dobra o tempo de geração de recursos e a alocação de memória RAM.
             \end{itemize}
-            
-            \vspace{0.4cm}
+            \vspace{0.3cm}
             \textbf{Tempo de Inferência x Qualidade}
             \begin{itemize}
-                \item Aumentar o \texttt{top\_k} melhora as chances de recuperar o filme ideal.
-                \item Porém, um contexto maior aumenta drasticamente a latência de geração de texto no LLM local.
+                \item Expandir o \texttt{top\_k} da busca recupera sinopses raras, contudo infla o número de tokens enviados ao prompt. A latência de inferência do LLM local cresce linearmente com o tamanho do contexto injetado.
             \end{itemize}
         \end{column}
         \begin{column}{0.5\textwidth}
-            \textbf{Qualidade por tipo de query} \\
-            \footnotesize (hit@5, Sentence Embeddings)
-            \normalsize
+            \textbf{Análise por Perfil de Query} \\
+            \footnotesize (Métrica hit@5 usando Sentence Embeddings) \normalsize
             \begin{itemize}
-                \item Queries bem elaboradas: \textbf{0,35--0,47}
-                \item Queries de usuário (curtas, vagas): \textbf{0,12}
+                \item Queries detalhadas/técnicas: \textbf{0,35 a 0,47}
+                \item Queries curtas/vagas de usuários: \textbf{0,12}
             \end{itemize}
             \vspace{0.2cm}
-            Queries reais são mais difíceis, mas a utilidade \textbf{sobe conforme a semântica melhora}: de 0 (TF-IDF / Word2Vec) para 0,12 (MiniLM). O app ganha alguma utilidade real, ainda que modesta.
-            \vspace{0.3cm} \\
-            \footnotesize{\textit{Gráfico completo no notebook de análise (Fase 2).}}
+            \small
+            As buscas reais de usuários são intrinsicamente mais difíceis devido à falta de palavras-chave, mas a utilidade do sistema escala significativamente com a inclusão do motor semântico em relação aos modelos puramente de frequência de palavras.
         \end{column}
     \end{columns}
 \end{frame}
 
 % ---------------------------------------------------
-% Slide 14: Ponto 13 - Conclusão
+% Slide 16: Ponto 13 - Conclusão
 % ---------------------------------------------------
 \begin{frame}{13. Demais aspectos relevantes}
     \begin{itemize}
         \item \textbf{Limitações Identificadas:}
         \begin{itemize}
-            \item O projeto atua restritamente em inglês.
-            \item Mesmo com limitação de temperatura no \textit{prompt}, modelos de linguagem pequenos (Phi-4 Mini) ainda apresentam risco de alucinação e falhas de formatação.
+            \item O corpus e os modelos operam restritamente na língua inglesa.
+            \item Modelos de linguagem pequenos de poucos bilhões de parâmetros (Phi-4 Mini), embora rápidos em CPU, são sensíveis a instruções negativas severas no prompt.
         \end{itemize}
-        \vspace{0.4cm}
-        \item \textbf{Aprendizados:}
+        \vspace{0.2cm}
+        \item \textbf{Principais Aprendizados do Grupo:}
         \begin{itemize}
-            \item Compreensão profunda das diferenças práticas (tempo, custo e qualidade) entre buscas exatas e aproximadas.
+            \item Domínio prático de estruturas de dados avançadas para busca em alta dimensionalidade (grafos de proximidade aproximados HNSW).
+            \item Compreensão dos gargalos de tempo de execução (Treinamento/Vetorização Offline vs Inferência Online).
         \end{itemize}
-        \vspace{0.4cm}
+        \vspace{0.2cm}
         \item \textbf{Próximos Passos:}
         \begin{itemize}
-            \item Integração com modelos maiores via nuvem.
-            \item Expansão do \textit{dataset} e refinamento do pré-processamento de metadados.
+            \item Implementação de técnicas de compressão vetorial (Quantização Vetorial) para otimização extrema de memória.
+            \item Adição de uma camada de tradução dinâmica para queries em português.
         \end{itemize}
     \end{itemize}
 \end{frame}
 
 % ---------------------------------------------------
-% Slide 15: Fechamento
+% Slide 17: Fechamento
 % ---------------------------------------------------
 \begin{frame}
     \begin{center}
         \Huge \textbf{Obrigado!} \\
         \vspace{1cm}
-        \Large Perguntas?
     \end{center}
 \end{frame}
 
